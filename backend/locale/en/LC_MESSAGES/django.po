@@ -1,6 +1,6 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# Urban Tree Observatory
+# Copyright (C) 2025 Legut
+# This file is distributed under the same license as the Urban Tree Observatory package.
 # Sebastián Duque <sduquet998@gmail.com>, 2025.
 #
 #, fuzzy
@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-26 13:22-0500\n"
+"POT-Creation-Date: 2025-05-01 06:20-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,41 +17,47 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-#: apps/biodiversity/models.py:16
+
+#: apps/biodiversity/models.py:17
 msgid "common name"
 msgstr "common name"
 
-#: apps/biodiversity/models.py:22 apps/taxonomy/models.py:278
-#: apps/taxonomy/models.py:279
+#: apps/biodiversity/models.py:23 apps/taxonomy/models.py:282
+msgctxt "plural"
 msgid "species"
 msgstr "species"
 
-#: apps/biodiversity/models.py:28
-msgid "place"
-msgstr "place"
+#: apps/biodiversity/models.py:29 apps/places/models/spatial.py:160
+#: apps/places/models/spatial.py:181
+msgid "neighborhood"
+msgstr "neighborhood"
 
-#: apps/biodiversity/models.py:30 apps/climate/models.py:12
+#: apps/biodiversity/models.py:35 apps/places/models/sites.py:15
+msgid "site"
+msgstr "site"
+
+#: apps/biodiversity/models.py:39 apps/climate/models.py:12
 msgid "location"
 msgstr "location"
 
-#: apps/biodiversity/models.py:31
+#: apps/biodiversity/models.py:40
 msgid "elevation (m)"
 msgstr "elevation (m)"
 
-#: apps/biodiversity/models.py:33 apps/reports/models.py:363
+#: apps/biodiversity/models.py:42 apps/reports/models.py:363
 msgid "recorded by"
 msgstr "recorded by"
 
-#: apps/biodiversity/models.py:35
+#: apps/biodiversity/models.py:44
 msgid "recorded date"
 msgstr "recorded date"
 
-#: apps/biodiversity/models.py:38 apps/reports/models.py:41
+#: apps/biodiversity/models.py:47 apps/reports/models.py:41
 #: apps/reports/models.py:148
 msgid "biodiversity record"
 msgstr "biodiversity record"
 
-#: apps/biodiversity/models.py:39
+#: apps/biodiversity/models.py:48
 msgid "biodiversity records"
 msgstr "biodiversity records"
 
@@ -63,7 +69,8 @@ msgstr "station code"
 msgid "station name"
 msgstr "station name"
 
-#: apps/climate/models.py:17 apps/places/models.py:42 apps/places/models.py:65
+#: apps/climate/models.py:17 apps/places/models/spatial.py:69
+#: apps/places/models/spatial.py:85 apps/places/models/spatial.py:112
 msgid "municipality"
 msgstr "municipality"
 
@@ -115,37 +122,84 @@ msgstr "created at"
 msgid "updated at"
 msgstr "updated at"
 
-#: apps/places/models.py:11 apps/places/models.py:29
-msgid "country"
-msgstr "country"
+#: apps/places/models/sites.py:10
+msgid "site name"
+msgstr "site name"
 
-#: apps/places/models.py:15
-msgid "countries"
-msgstr "countries"
-
-#: apps/places/models.py:24 apps/places/models.py:47
-msgid "department"
-msgstr "department"
-
-#: apps/places/models.py:52
-msgid "municipalities"
-msgstr "municipalities"
-
-#: apps/places/models.py:67
-msgid "site"
-msgstr "site"
-
-#: apps/places/models.py:68
-msgid "populated center"
-msgstr "populated center"
-
-#: apps/places/models.py:69
+#: apps/places/models/sites.py:11
 msgid "zone"
 msgstr "zone"
 
-#: apps/places/models.py:70
+#: apps/places/models/sites.py:12
 msgid "subzone"
 msgstr "subzone"
+
+#: apps/places/models/sites.py:16
+msgid "sites"
+msgstr "sites"
+
+#: apps/places/models/spatial.py:11 apps/places/models/spatial.py:21
+#: apps/places/models/spatial.py:37
+msgid "country"
+msgstr "country"
+
+#: apps/places/models/spatial.py:13
+msgid "country boundary"
+msgstr "country boundary"
+
+#: apps/places/models/spatial.py:22
+msgid "countries"
+msgstr "countries"
+
+#: apps/places/models/spatial.py:32 apps/places/models/spatial.py:48
+#: apps/places/models/spatial.py:74
+msgid "department"
+msgstr "department"
+
+#: apps/places/models/spatial.py:40
+msgid "department boundary"
+msgstr "department boundary"
+
+#: apps/places/models/spatial.py:49
+msgid "departments"
+msgstr "departments"
+
+#: apps/places/models/spatial.py:77
+msgid "municipality boundary"
+msgstr "municipality boundary"
+
+#: apps/places/models/spatial.py:86
+msgid "municipalities"
+msgstr "municipalities"
+
+#: apps/places/models/spatial.py:107 apps/places/models/spatial.py:133
+#: apps/places/models/spatial.py:165
+msgid "locality"
+msgstr "locality"
+
+#: apps/places/models/spatial.py:115
+msgid "locality boundary"
+msgstr "locality boundary"
+
+#: apps/places/models/spatial.py:121 apps/places/models/spatial.py:174
+msgid "calculated area (m²)"
+msgstr "calculated area (m²)"
+
+#: apps/places/models/spatial.py:126
+msgid "population 2019"
+msgstr "population 2019"
+
+#: apps/places/models/spatial.py:134
+msgid "localities"
+msgstr "municipalities"
+
+#: apps/places/models/spatial.py:168
+msgid "neighborhood boundary"
+msgstr "neighborhood boundary"
+
+#: apps/places/models/spatial.py:182
+msgid "neighborhoods"
+msgstr "neighborhoods"
 
 #: apps/reports/models.py:15
 msgid "trunk height"
@@ -516,317 +570,323 @@ msgstr "observation"
 msgid "observations"
 msgstr "observations"
 
-#: apps/taxonomy/models.py:27
+#: apps/taxonomy/models.py:30
 msgid "family name"
 msgstr "family name"
 
-#: apps/taxonomy/models.py:30 apps/taxonomy/models.py:46
+#: apps/taxonomy/models.py:33 apps/taxonomy/models.py:49
 msgid "family"
 msgstr "family"
 
-#: apps/taxonomy/models.py:31
+#: apps/taxonomy/models.py:34
 msgid "families"
 msgstr "families"
 
-#: apps/taxonomy/models.py:41
+#: apps/taxonomy/models.py:44
 msgid "genus name"
 msgstr "genus name"
 
-#: apps/taxonomy/models.py:50 apps/taxonomy/models.py:219
+#: apps/taxonomy/models.py:53 apps/taxonomy/models.py:222
 msgid "genus"
 msgstr "genus"
 
-#: apps/taxonomy/models.py:51
+#: apps/taxonomy/models.py:54
 msgid "genera"
 msgstr "genera"
 
-#: apps/taxonomy/models.py:62
+#: apps/taxonomy/models.py:65
 msgid "carbon sequestration (%)"
 msgstr "carbon sequestration (%)"
 
-#: apps/taxonomy/models.py:63
+#: apps/taxonomy/models.py:66
 msgid "shade index"
 msgstr "shade index"
 
-#: apps/taxonomy/models.py:64
+#: apps/taxonomy/models.py:67
 msgid "canopy diameter (m)"
 msgstr "canopy diameter (m)"
 
-#: apps/taxonomy/models.py:65
+#: apps/taxonomy/models.py:68
 msgid "maximum height (m)"
 msgstr "maximum height (m)"
 
-#: apps/taxonomy/models.py:68
+#: apps/taxonomy/models.py:71
 msgid "trait type"
 msgstr "trait type"
 
-#: apps/taxonomy/models.py:88
+#: apps/taxonomy/models.py:91
 msgid "trait"
 msgstr "trait"
 
-#: apps/taxonomy/models.py:94 apps/taxonomy/models.py:149
-#: apps/taxonomy/models.py:228
+#: apps/taxonomy/models.py:97 apps/taxonomy/models.py:152
+#: apps/taxonomy/models.py:231
 msgid "functional group"
 msgstr "functional group"
 
-#: apps/taxonomy/models.py:97
+#: apps/taxonomy/models.py:100
 msgid "minimum value"
 msgstr "minimum value"
 
-#: apps/taxonomy/models.py:101
+#: apps/taxonomy/models.py:104
 msgid "Minimum value for this trait in the functional group"
 msgstr "Minimum value for this trait in the functional group"
 
-#: apps/taxonomy/models.py:104
+#: apps/taxonomy/models.py:107
 msgid "maximum value"
 msgstr "maximum value"
 
-#: apps/taxonomy/models.py:108
+#: apps/taxonomy/models.py:111
 msgid "Maximum value for this trait in the functional group"
 msgstr "Maximum value for this trait in the functional group"
 
-#: apps/taxonomy/models.py:112
+#: apps/taxonomy/models.py:115
 msgid "trait value"
 msgstr "trait value"
 
-#: apps/taxonomy/models.py:113
+#: apps/taxonomy/models.py:116
 msgid "trait values"
 msgstr "trait values"
 
-#: apps/taxonomy/models.py:137
+#: apps/taxonomy/models.py:140
 msgid "group id"
 msgstr "group id"
 
-#: apps/taxonomy/models.py:138
+#: apps/taxonomy/models.py:141
 msgid "Unique identifier for the functional group"
 msgstr "Unique identifier for the functional group"
 
-#: apps/taxonomy/models.py:145
+#: apps/taxonomy/models.py:148
 msgid "traits"
 msgstr "traits"
 
-#: apps/taxonomy/models.py:150
+#: apps/taxonomy/models.py:153
 msgid "functional groups"
 msgstr "functional groups"
 
-#: apps/taxonomy/models.py:161
+#: apps/taxonomy/models.py:164
 msgid "native"
 msgstr "native"
 
-#: apps/taxonomy/models.py:162
+#: apps/taxonomy/models.py:165
 msgid "cultivated"
 msgstr "cultivated"
 
-#: apps/taxonomy/models.py:163
+#: apps/taxonomy/models.py:166
 msgid "native | cultivated"
 msgstr "native | cultivated"
 
-#: apps/taxonomy/models.py:164
+#: apps/taxonomy/models.py:167
 msgid "naturalized"
 msgstr "naturalized"
 
-#: apps/taxonomy/models.py:165
+#: apps/taxonomy/models.py:168
 msgid "naturalized | cultivated"
 msgstr "naturalized | cultivated"
 
-#: apps/taxonomy/models.py:166
+#: apps/taxonomy/models.py:169
 msgid "endemic"
 msgstr "endemic"
 
-#: apps/taxonomy/models.py:167 apps/taxonomy/models.py:200
-#: apps/taxonomy/models.py:213
+#: apps/taxonomy/models.py:170 apps/taxonomy/models.py:203
+#: apps/taxonomy/models.py:216
 msgid "not identified"
 msgstr "not identified"
 
-#: apps/taxonomy/models.py:170
+#: apps/taxonomy/models.py:173
 msgid "data deficient"
 msgstr "data deficient"
 
-#: apps/taxonomy/models.py:171
+#: apps/taxonomy/models.py:174
 msgid "least concern"
 msgstr "least concern"
 
-#: apps/taxonomy/models.py:172
+#: apps/taxonomy/models.py:175
 msgid "lower risk / conservation dependent"
 msgstr "lower risk / conservation dependent"
 
-#: apps/taxonomy/models.py:173
+#: apps/taxonomy/models.py:176
 msgid "near threatened"
 msgstr "near threatened"
 
-#: apps/taxonomy/models.py:174
+#: apps/taxonomy/models.py:177
 msgid "vulnerable"
 msgstr "vulnerable"
 
-#: apps/taxonomy/models.py:175
+#: apps/taxonomy/models.py:178
 msgid "endangered"
 msgstr "endangered"
 
-#: apps/taxonomy/models.py:176
+#: apps/taxonomy/models.py:179
 msgid "critically endangered"
 msgstr "critically endangered"
 
-#: apps/taxonomy/models.py:177
+#: apps/taxonomy/models.py:180
 msgid "extinct in the wild"
 msgstr "extinct in the wild"
 
-#: apps/taxonomy/models.py:178
+#: apps/taxonomy/models.py:181
 msgid "extinct"
 msgstr "extinct"
 
-#: apps/taxonomy/models.py:179
+#: apps/taxonomy/models.py:182
 msgid "not evaluated"
 msgstr "not evaluated"
 
-#: apps/taxonomy/models.py:182
+#: apps/taxonomy/models.py:185
 msgid "tree"
 msgstr "tree"
 
-#: apps/taxonomy/models.py:183
+#: apps/taxonomy/models.py:186
 msgid "palm tree"
 msgstr "palm tree"
 
-#: apps/taxonomy/models.py:184
+#: apps/taxonomy/models.py:187
 msgid "shrub"
 msgstr "shrub"
 
-#: apps/taxonomy/models.py:185 apps/taxonomy/models.py:199
-#: apps/taxonomy/models.py:212
+#: apps/taxonomy/models.py:188 apps/taxonomy/models.py:202
+#: apps/taxonomy/models.py:215
 msgid "other"
 msgstr "other"
 
-#: apps/taxonomy/models.py:188
+#: apps/taxonomy/models.py:191
 msgid "broad"
 msgstr "broad"
 
-#: apps/taxonomy/models.py:189
+#: apps/taxonomy/models.py:192
 msgid "caulirosula - fan"
 msgstr "caulirosula - fan"
 
-#: apps/taxonomy/models.py:190
+#: apps/taxonomy/models.py:193
 msgid "caulirosula - feather"
 msgstr "caulirosula - feather"
 
-#: apps/taxonomy/models.py:191
+#: apps/taxonomy/models.py:194
 msgid "caulirosula sespitoso"
 msgstr "caulirosula sespitoso"
 
-#: apps/taxonomy/models.py:192
+#: apps/taxonomy/models.py:195
 msgid "columnar"
 msgstr "columnar"
 
-#: apps/taxonomy/models.py:193
+#: apps/taxonomy/models.py:196
 msgid "globose"
 msgstr "globose"
 
-#: apps/taxonomy/models.py:194
+#: apps/taxonomy/models.py:197
 msgid "irregular"
 msgstr "irregular"
 
-#: apps/taxonomy/models.py:195
+#: apps/taxonomy/models.py:198
 msgid "oval"
 msgstr "oval"
 
-#: apps/taxonomy/models.py:196
+#: apps/taxonomy/models.py:199
 msgid "pyramidal"
 msgstr "pyramidal"
 
-#: apps/taxonomy/models.py:197
+#: apps/taxonomy/models.py:200
 msgid "semiglobose"
 msgstr "semiglobose"
 
-#: apps/taxonomy/models.py:198
+#: apps/taxonomy/models.py:201
 msgid "spreading"
 msgstr "spreading"
 
-#: apps/taxonomy/models.py:203
+#: apps/taxonomy/models.py:206
 msgid "brown"
 msgstr "brown"
 
-#: apps/taxonomy/models.py:204
+#: apps/taxonomy/models.py:207
 msgid "fuchsia"
 msgstr "fuchsia"
 
-#: apps/taxonomy/models.py:205
+#: apps/taxonomy/models.py:208
 msgid "green"
 msgstr "green"
 
-#: apps/taxonomy/models.py:206
+#: apps/taxonomy/models.py:209
 msgid "orange"
 msgstr "orange"
 
-#: apps/taxonomy/models.py:207
+#: apps/taxonomy/models.py:210
 msgid "pink"
 msgstr "pink"
 
-#: apps/taxonomy/models.py:208
+#: apps/taxonomy/models.py:211
 msgid "red"
 msgstr "red"
 
-#: apps/taxonomy/models.py:209
+#: apps/taxonomy/models.py:212
 msgid "violet"
 msgstr "violet"
 
-#: apps/taxonomy/models.py:210
+#: apps/taxonomy/models.py:213
 msgid "white"
 msgstr "white"
 
-#: apps/taxonomy/models.py:211
+#: apps/taxonomy/models.py:214
 msgid "yellow"
 msgstr "yellow"
 
-#: apps/taxonomy/models.py:222
+#: apps/taxonomy/models.py:225
 msgid "species name"
 msgstr "species name"
 
-#: apps/taxonomy/models.py:222
+#: apps/taxonomy/models.py:225
 msgid "Species name without the genus"
 msgstr "Species name without the genus"
 
-#: apps/taxonomy/models.py:232
+#: apps/taxonomy/models.py:235
 msgid "accepted scientific name"
 msgstr "accepted scientific name"
 
-#: apps/taxonomy/models.py:235
+#: apps/taxonomy/models.py:238
 msgid ""
 "Scientific genus and species name with optional reference to whom named it"
-msgstr "Scientific genus and species name with optional reference to whom named it"
+msgstr ""
+"Scientific genus and species name with optional reference to whom named it"
 
-#: apps/taxonomy/models.py:240
+#: apps/taxonomy/models.py:243
 msgid "origin"
 msgstr "origin"
 
-#: apps/taxonomy/models.py:246
+#: apps/taxonomy/models.py:249
 msgid "IUCN status"
 msgstr "IUCN status"
 
-#: apps/taxonomy/models.py:252
+#: apps/taxonomy/models.py:255
 msgid "life form"
 msgstr "life form"
 
-#: apps/taxonomy/models.py:258
+#: apps/taxonomy/models.py:261
 msgid "canopy shape"
 msgstr "canopy shape"
 
-#: apps/taxonomy/models.py:264
+#: apps/taxonomy/models.py:267
 msgid "flower color"
 msgstr "flower color"
 
-#: apps/taxonomy/models.py:270
+#: apps/taxonomy/models.py:273
 msgid "GBIF ID"
 msgstr "GBIF ID"
 
-#: apps/taxonomy/models.py:270
+#: apps/taxonomy/models.py:273
 msgid "GBIF species identifier"
 msgstr "GBIF species identifier"
 
-#: apps/taxonomy/models.py:273
+#: apps/taxonomy/models.py:276
 msgid "identified by"
 msgstr "identified by"
 
-#: apps/taxonomy/models.py:275
+#: apps/taxonomy/models.py:278
 msgid "identified date"
 msgstr "identified date"
+
+#: apps/taxonomy/models.py:281
+msgctxt "singular"
+msgid "species"
+msgstr "species"
 
 #: apps/users/models.py:28
 msgid "user profile"
@@ -836,10 +896,10 @@ msgstr "user profile"
 msgid "user profiles"
 msgstr "user profiles"
 
-#: config/settings/base.py:156
+#: config/settings/base.py:167
 msgid "Spanish"
 msgstr "Spanish"
 
-#: config/settings/base.py:157
+#: config/settings/base.py:168
 msgid "English"
 msgstr "English"

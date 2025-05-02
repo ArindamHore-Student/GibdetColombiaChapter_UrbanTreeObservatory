@@ -3,6 +3,7 @@ import * as L from 'leaflet';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-map',
@@ -99,6 +100,8 @@ import { HttpClientModule } from '@angular/common/http';
 export class MapComponent implements AfterViewInit, OnChanges {
   @Input() isSidebarOpen: boolean = true;
   private map!: L.Map;
+  private shownLabels = new Set<string>();
+  
   selectedRegion: any = {
     name: 'Ibagué Overview',
     statistics: {
@@ -131,85 +134,127 @@ export class MapComponent implements AfterViewInit, OnChanges {
     this.map = L.map('map').setView([4.4389, -75.2322], 14);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
+      maxZoom: 20,
       attribution: '© OpenStreetMap contributors'
     }).addTo(this.map);
 
-    this.http.get('assets/ibague_communes.geojson').subscribe((geoJson: any) => {
-      L.geoJSON(geoJson, {
-        style: (feature) => {
-          return {
-            color: '#ffffff',
-            weight: 1,
-            fillColor: '#2F7B3D',
-            fillOpacity: 0.7,
-            opacity: 1
+    // List of IDs from 1 to 13
+    const comunaIds = Array.from({ length: 13 }, (_, i) => i + 1);
+    
+   // Make requests in parallel
+    forkJoin(
+      comunaIds.map(id => 
+        this.http.get<any>(`http://localhost:8000/api/v1/places/localities/${id}/`)
+      )
+    ).subscribe({
+      next: (responses) => {
+        const allLayers = L.featureGroup();
+
+        responses.forEach(data => {
+          // Validate data before processing
+          if (!data?.boundary?.coordinates) return;
+
+          const geojsonFeature = {
+            type: 'Feature' as const,
+            geometry: data.boundary,
+            properties: {
+              name: data.name || `Comuna ${data.id}`,
+              statistics: data.statistics || {},
+              environmental: data.environmental || {}
+            }
           };
-        },
-        onEachFeature: (feature, layer) => {
-          if (feature.properties) {
-            const center = (layer as L.Polygon).getBounds().getCenter();
 
-            const label = L.divIcon({
-              className: 'region-label',
-              html: `<div class="label-content">
-                      <div class="region-name">${feature.properties.name || 'Unknown Region'}</div>
-                      ${feature.properties.statistics ?
-                        `<div class="statistics">${feature.properties.statistics}</div>`
-                        : ''}
-                    </div>`,
-              iconSize: [200, 50],
-              iconAnchor: [100, 25]
-            });
+          const geoLayer = L.geoJSON(geojsonFeature, {
+            style: {
+              color: '#ffffff',
+              weight: 1,
+              fillColor: '#2F7B3D',
+              fillOpacity: 0.5
+            },
+            onEachFeature: (feature, layer) => {
+              if (feature.properties) {
+                const comuna = feature.properties.name || 'Unknown Region';
 
-            L.marker(center, {
-              icon: label,
-              interactive: false
-            }).addTo(this.map);
+                if (!this.shownLabels.has(comuna)) {
+                  try {
+                    const bounds = (layer as L.Polygon).getBounds();
+                    if (bounds.isValid()) {
+                      const center = bounds.getCenter();
 
-            // Add hover effect
-            layer.on({
-              mouseover: (e) => {
-                const layer = e.target;
-                layer.setStyle({
-                  fillOpacity: 0.9
-                });
-              },
-              mouseout: (e) => {
-                const layer = e.target;
-                layer.setStyle({
-                  fillOpacity: 0.7
-                });
-              },
-              click: (e) => {
-                const layer = e.target;
-                const bounds = layer.getBounds();
+                      const label = L.divIcon({
+                        className: 'region-label',
+                        html: `<div class="label-content">
+                                <div class="region-name">${comuna}</div>
+                                ${feature.properties.statistics ?
+                                  `<div class="statistics">${feature.properties.statistics.totalTrees || 'N/A'}</div>`
+                                  : ''}
+                              </div>`,
+                        iconSize: [200, 50],
+                        iconAnchor: [100, 25]
+                      });
 
-                // Zoom to the clicked region
-                this.map.fitBounds(bounds, {
-                  padding: [10, 10],
-                  maxZoom: 16
-                });
+                      L.marker(center, {
+                        icon: label,
+                        interactive: false
+                      }).addTo(this.map);
 
-                // Update region details
-                this.selectedRegion = {
-                  name: feature.properties.name || 'Unknown Region',
-                  statistics: feature.properties.statistics || {
-                    totalTrees: 'N/A',
-                    speciesCount: 'N/A',
-                    avgHeight: 'N/A',
-                    healthIndex: 'N/A'
-                  },
-                  environmental: feature.properties.environmental || {
-                    co2Absorption: 'N/A',
-                    oxygenProduction: 'N/A'
+                      this.shownLabels.add(comuna);
+                    }
+                  } catch (error) {
+                    console.warn(`Error creando etiqueta para ${comuna}:`, error);
                   }
-                };
+                }
+
+                layer.on({
+                  mouseover: (e) => {
+                    const layer = e.target;
+                    layer.setStyle({ fillOpacity: 0.7 });
+                  },
+                  mouseout: (e) => {
+                    const layer = e.target;
+                    layer.setStyle({ fillOpacity: 0.5 });
+                  },
+                  click: (e) => {
+                    const layer = e.target;
+                    const bounds = layer.getBounds();
+
+                    this.map.fitBounds(bounds, {
+                      padding: [10, 10],
+                      maxZoom: 16
+                    });
+
+                    this.selectedRegion = {
+                      name: feature.properties.name || comuna,
+                      statistics: feature.properties.statistics || {
+                        totalTrees: 'N/A',
+                        speciesCount: 'N/A',
+                        avgHeight: 'N/A',
+                        healthIndex: 'N/A'
+                      },
+                      environmental: feature.properties.environmental || {
+                        co2Absorption: 'N/A',
+                        oxygenProduction: 'N/A'
+                      }
+                    };
+                  }
+                });
               }
-            });
-          }
+            }
+          });
+
+          geoLayer.addTo(allLayers);
+        });
+
+        if (allLayers.getLayers().length > 0) {
+          allLayers.addTo(this.map);
+          this.map.fitBounds(allLayers.getBounds(), { padding: [40, 40] });
+          setTimeout(() => this.map.invalidateSize(), 100);
         }
-      }).addTo(this.map);
+      },
+      error: (error) => {
+        console.error('Error cargando comunas:', error);
+      }
     });
   }
 }
+

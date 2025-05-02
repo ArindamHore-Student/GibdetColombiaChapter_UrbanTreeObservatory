@@ -49,6 +49,58 @@ MIDDLEWARE = [
 ]
 ```
 
+### Docker Configuration for Translations
+
+Our Docker setup includes everything needed for translations:
+
+1. **Dockerfile** installs the required `gettext` package:
+
+   ```docker
+   # Install Python and dependencies
+   RUN apt-get update && apt-get install -y \
+       python3-dev \
+       python3-pip \
+       python3-venv \
+       gettext \  # Required for Django translations
+       && apt-get clean \
+       && rm -rf /var/lib/apt/lists/*
+   ```
+
+2. **docker-entrypoint.sh** compiles messages automatically in production:
+
+   ```bash
+   #!/bin/bash
+   set -e
+
+   # Run migrations
+   echo "Running migrations..."
+   python manage.py migrate --noinput
+
+   # Always compile messages to ensure translations work
+   echo "Compiling translation messages..."
+   python manage.py compilemessages
+
+   # Collect static files if not in debug mode
+   if [ "$DEBUG" = "0" ]; then
+       echo "Production mode detected (DEBUG=0)"
+       echo "Collecting static files..."
+       python manage.py collectstatic --noinput
+   else
+       echo "Development mode detected (DEBUG=$DEBUG)"
+   fi
+
+   # Start server
+   echo "Starting server..."
+   exec "$@"
+   ```
+
+3. **Volume Mapping** in `compose.yaml` ensures translation files are accessible:
+
+   ```yaml
+   volumes:
+     - ./backend:/app
+   ```
+
 ### TextChoices Implementation
 
 Correct approach for TextChoices:
@@ -428,7 +480,7 @@ def process_taxonomy_data(data):
 
 ## Workflow for Adding/Updating Translations
 
-### Django Translations
+### Django Translations - Docker Environment
 
 1. Mark strings for translation in code:
 
@@ -436,6 +488,39 @@ def process_taxonomy_data(data):
    from django.utils.translation import gettext_lazy as _
 
    title = _("Species List")
+   ```
+
+2. Extract messages using Docker:
+
+   ```bash
+   # From project root
+   docker compose exec backend python manage.py makemessages -l es
+   docker compose exec backend python manage.py makemessages -l en
+   ```
+
+3. Edit translation files in `backend/locale/[lang]/LC_MESSAGES/django.po`
+
+4. Compile messages:
+
+   ```bash
+   # From project root
+   docker compose exec backend python manage.py compilemessages
+   ```
+
+   > Note: In the production environment, message compilation happens automatically during container startup. In development, you must run this command manually whenever you update translations.
+
+5. Restart services if needed (usually not required in development due to volume mounting):
+
+   ```bash
+   docker compose restart backend
+   ```
+
+### Django Translations - Direct Environment (without Docker)
+
+1. Navigate to the backend directory:
+
+   ```bash
+   cd backend
    ```
 
 2. Extract messages:
@@ -452,6 +537,23 @@ def process_taxonomy_data(data):
    ```bash
    python manage.py compilemessages
    ```
+
+### Translation File Structure
+
+Your translation files will follow this structure:
+
+```text
+backend/
+└── locale/
+    ├── en/
+    │   └── LC_MESSAGES/
+    │       ├── django.po   # Editable translation source
+    │       └── django.mo   # Compiled translation file (auto-generated)
+    └── es/
+        └── LC_MESSAGES/
+            ├── django.po
+            └── django.mo
+```
 
 ### Angular Translations
 
@@ -577,6 +679,70 @@ describe('TranslationService', () => {
 1. **Lazy loading** of translation files in Angular
 2. **Caching API responses** with language-specific keys
 3. **Server-side rendering** with correct initial language
+
+## Troubleshooting Translation Issues
+
+### Missing Translations
+
+If your translations aren't showing up:
+
+1. **Check if compilemessages was run**:
+
+   ```bash
+   docker compose exec backend python manage.py compilemessages
+   ```
+
+2. **Verify .mo files exist**:
+
+   ```bash
+   docker compose exec backend ls -la /app/locale/*/LC_MESSAGES/
+   ```
+
+   You should see both `.po` and `.mo` files for each language.
+
+3. **Restart the server** if needed:
+
+   ```bash
+   docker compose restart backend
+   ```
+
+### Translation Tools Issues
+
+If you encounter issues with the translation commands:
+
+1. **Check gettext installation**:
+
+   ```bash
+   docker compose exec backend bash -c "dpkg -l | grep gettext"
+   ```
+
+   Should show gettext as installed.
+
+2. **Manual compilation** (if automated doesn't work):
+
+   ```bash
+   docker compose exec backend bash -c "cd /app && django-admin compilemessages"
+   ```
+
+3. **Debug entrypoint script**:
+
+   ```bash
+   docker compose exec -e DEBUG=0 backend bash -c "set -x && /docker-entrypoint.sh echo 'Debug mode'"
+   ```
+
+   This runs the entrypoint script with verbose output.
+
+### Docker-specific Issues
+
+1. **Check file permissions**: Ensure the host user can write to `.po` files.
+
+2. **Volume mounting problems**: Verify Docker has proper access to mounted volumes.
+
+3. **Container restart required**: Some changes require container restart:
+
+   ```bash
+   docker compose down && docker compose up -d
+   ```
 
 ---
 

@@ -79,7 +79,7 @@ jobs:
     - name: Install system dependencies
       run: |
           sudo apt-get update
-          sudo apt-get install -y binutils libproj-dev gdal-bin libgdal-dev python3-gdal postgresql-client
+          sudo apt-get install -y binutils libproj-dev gdal-bin libgdal-dev python3-gdal postgresql-client gettext
 
     - name: Install Python dependencies
       run: |
@@ -98,6 +98,10 @@ jobs:
     - name: Run migrations
       working-directory: ./backend
       run: python manage.py migrate
+
+    - name: Compile translation messages
+      working-directory: ./backend
+      run: python manage.py compilemessages
 
     - name: Run collectstatic
       working-directory: ./backend
