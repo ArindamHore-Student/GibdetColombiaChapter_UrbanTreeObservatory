@@ -113,11 +113,6 @@ export class MapComponent implements AfterViewInit, OnChanges {
     }
   };
 
-  private communesLayer!: L.GeoJSON;
-  private neighborhoodsLayer!: L.GeoJSON;
-  private communesLoaded = false;
-  private neighborhoodsLoaded = false;
-
   constructor(private http: HttpClient) {}
 
   ngAfterViewInit() {
@@ -140,110 +135,81 @@ export class MapComponent implements AfterViewInit, OnChanges {
       attribution: '© OpenStreetMap contributors'
     }).addTo(this.map);
 
-    // Load communes (localities) layer from backend API
-    this.http.get('/api/v1/places/localities/?format=geojson').subscribe((geoJson: any) => {
-      this.communesLayer = L.geoJSON(geoJson, {
-        style: (feature) => ({
-          color: '#ffffff',
-          weight: 1,
-          fillColor: '#2F7B3D',
-          fillOpacity: 0.7,
-          opacity: 1
-        }),
-        onEachFeature: (feature, layer) => this.onEachRegionFeature(feature, layer, 'commune')
-      });
-      this.communesLoaded = true;
-      if (this.map.getZoom() <= 12) {
-        this.communesLayer.addTo(this.map);
-      }
-    });
-
-    // Load neighborhoods layer from backend API
-    this.http.get('/api/v1/places/neighborhoods/?format=geojson').subscribe((geoJson: any) => {
-      this.neighborhoodsLayer = L.geoJSON(geoJson, {
-        style: (feature) => ({
-          color: '#ffffff',
-          weight: 1,
-          fillColor: '#1E90FF',
-          fillOpacity: 0.7,
-          opacity: 1
-        }),
-        onEachFeature: (feature, layer) => this.onEachRegionFeature(feature, layer, 'neighborhood')
-      });
-      this.neighborhoodsLoaded = true;
-      if (this.map.getZoom() >= 13) {
-        this.neighborhoodsLayer.addTo(this.map);
-      }
-    });
-
-    // Listen for zoom changes
-    this.map.on('zoomend', () => {
-      const zoom = this.map.getZoom();
-      if (zoom <= 12) {
-        if (this.neighborhoodsLayer && this.map.hasLayer(this.neighborhoodsLayer)) {
-          this.map.removeLayer(this.neighborhoodsLayer);
-        }
-        if (this.communesLayer && !this.map.hasLayer(this.communesLayer)) {
-          this.communesLayer.addTo(this.map);
-        }
-      } else {
-        if (this.communesLayer && this.map.hasLayer(this.communesLayer)) {
-          this.map.removeLayer(this.communesLayer);
-        }
-        if (this.neighborhoodsLayer && !this.map.hasLayer(this.neighborhoodsLayer)) {
-          this.neighborhoodsLayer.addTo(this.map);
-        }
-      }
-    });
-  }
-
-  private onEachRegionFeature(feature: any, layer: L.Layer, type: 'commune' | 'neighborhood') {
-    if (feature.properties) {
-      const center = (layer as L.Polygon).getBounds().getCenter();
-      const label = L.divIcon({
-        className: 'region-label',
-        html: `<div class="label-content">
-                <div class="region-name">${feature.properties.name || 'Unknown Region'}</div>
-                ${feature.properties.statistics ?
-                  `<div class="statistics">${feature.properties.statistics}</div>`
-                  : ''}
-              </div>`,
-        iconSize: [200, 50],
-        iconAnchor: [100, 25]
-      });
-      L.marker(center, {
-        icon: label,
-        interactive: false
-      }).addTo(this.map);
-      // Add hover effect
-      layer.on({
-        mouseover: (e) => {
-          const l = e.target;
-          l.setStyle({ fillOpacity: 0.9 });
-        },
-        mouseout: (e) => {
-          const l = e.target;
-          l.setStyle({ fillOpacity: 0.7 });
-        },
-        click: (e) => {
-          const l = e.target;
-          const bounds = l.getBounds();
-          this.map.fitBounds(bounds, { padding: [10, 10], maxZoom: 16 });
-          this.selectedRegion = {
-            name: feature.properties.name || 'Unknown Region',
-            statistics: feature.properties.statistics || {
-              totalTrees: 'N/A',
-              speciesCount: 'N/A',
-              avgHeight: 'N/A',
-              healthIndex: 'N/A'
-            },
-            environmental: feature.properties.environmental || {
-              co2Absorption: 'N/A',
-              oxygenProduction: 'N/A'
-            }
+    this.http.get('assets/ibague_communes.geojson').subscribe((geoJson: any) => {
+      L.geoJSON(geoJson, {
+        style: (feature) => {
+          return {
+            color: '#ffffff',
+            weight: 1,
+            fillColor: '#2F7B3D',
+            fillOpacity: 0.7,
+            opacity: 1
           };
+        },
+        onEachFeature: (feature, layer) => {
+          if (feature.properties) {
+            const center = (layer as L.Polygon).getBounds().getCenter();
+
+            const label = L.divIcon({
+              className: 'region-label',
+              html: `<div class="label-content">
+                      <div class="region-name">${feature.properties.name || 'Unknown Region'}</div>
+                      ${feature.properties.statistics ?
+                        `<div class="statistics">${feature.properties.statistics}</div>`
+                        : ''}
+                    </div>`,
+              iconSize: [200, 50],
+              iconAnchor: [100, 25]
+            });
+
+            L.marker(center, {
+              icon: label,
+              interactive: false
+            }).addTo(this.map);
+
+            // Add hover effect
+            layer.on({
+              mouseover: (e) => {
+                const layer = e.target;
+                layer.setStyle({
+                  fillOpacity: 0.9
+                });
+              },
+              mouseout: (e) => {
+                const layer = e.target;
+                layer.setStyle({
+                  fillOpacity: 0.7
+                });
+              },
+              click: (e) => {
+                const layer = e.target;
+                const bounds = layer.getBounds();
+
+                // Zoom to the clicked region
+                this.map.fitBounds(bounds, {
+                  padding: [10, 10],
+                  maxZoom: 16
+                });
+
+                // Update region details
+                this.selectedRegion = {
+                  name: feature.properties.name || 'Unknown Region',
+                  statistics: feature.properties.statistics || {
+                    totalTrees: 'N/A',
+                    speciesCount: 'N/A',
+                    avgHeight: 'N/A',
+                    healthIndex: 'N/A'
+                  },
+                  environmental: feature.properties.environmental || {
+                    co2Absorption: 'N/A',
+                    oxygenProduction: 'N/A'
+                  }
+                };
+              }
+            });
+          }
         }
-      });
-    }
+      }).addTo(this.map);
+    });
   }
 }
