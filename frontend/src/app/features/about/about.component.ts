@@ -168,7 +168,82 @@ import { CommonModule } from '@angular/common';
           </div>
         </div>
       </div>
-      
+
+      <!-- Sponsors -->
+      <div class="border rounded-lg shadow p-4">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Sponsors</h2>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="bg-gray-50 p-3 rounded-md border border-gray-200">
+            <div class="flex justify-center items-center">
+              <svg  xmlns="http://www.w3.org/2000/svg" width="200" height="200" fill="currentColor">
+                <rect width="100%" height="100%" fill="#e0e0e0" stroke="#a0a0a0" stroke-dasharray="5,5"/>
+                  <text x="100" y="100"
+                      font-family="sans-serif"
+                      font-size="20"
+                      fill="#555"
+                      text-anchor="middle"
+                      dominant-baseline="middle">
+                    Logo Sponsor 1
+                </text>
+              </svg>
+            </div>
+            <h3 class="font-medium text-primary-700 text-center">Sponsor 1</h3>
+          </div>
+
+          <div class="bg-gray-50 p-3 rounded-md border border-gray-200">
+            <div class="flex justify-center items-center">
+              <svg  xmlns="http://www.w3.org/2000/svg" width="200" height="200" fill="currentColor">
+                <rect width="100%" height="100%" fill="#e0e0e0" stroke="#a0a0a0" stroke-dasharray="5,5"/>
+                  <text x="100" y="100"
+                      font-family="sans-serif"
+                      font-size="20"
+                      fill="#555"
+                      text-anchor="middle"
+                      dominant-baseline="middle">
+                    Logo Sponsor 2
+                </text>
+              </svg>
+            </div>
+            <h3 class="font-medium text-primary-700 text-center">Sponsor 2</h3>
+          </div>
+
+          <div class="bg-gray-50 p-3 rounded-md border border-gray-200">
+            <div class="flex justify-center items-center">
+              <svg  xmlns="http://www.w3.org/2000/svg" width="200" height="200" fill="currentColor">
+                <rect width="100%" height="100%" fill="#e0e0e0" stroke="#a0a0a0" stroke-dasharray="5,5"/>
+                  <text x="100" y="100"
+                      font-family="sans-serif"
+                      font-size="20"
+                      fill="#555"
+                      text-anchor="middle"
+                      dominant-baseline="middle">
+                    Logo Sponsor 3
+                </text>
+              </svg>
+            </div>
+            <h3 class="font-medium text-primary-700 text-center">Sponsor 3</h3>
+          </div>
+
+          <div class="bg-gray-50 p-3 rounded-md border border-gray-200">
+            <div class="flex justify-center items-center">
+              <svg  xmlns="http://www.w3.org/2000/svg" width="200" height="200" fill="currentColor">
+                <rect width="100%" height="100%" fill="#e0e0e0" stroke="#a0a0a0" stroke-dasharray="5,5"/>
+                  <text x="100" y="100"
+                      font-family="sans-serif"
+                      font-size="20"
+                      fill="#555"
+                      text-anchor="middle"
+                      dominant-baseline="middle">
+                    Logo Sponsor 4
+                </text>
+              </svg>
+            </div>
+            <h3 class="font-medium text-primary-700 text-center">Sponsor 4</h3>
+          </div>
+        </div>
+      </div>
+
+
       <div class="border-t pt-6">
         <h2 class="text-lg font-semibold text-gray-800 mb-4">Get Involved</h2>
         <p class="text-gray-700 mb-4">
