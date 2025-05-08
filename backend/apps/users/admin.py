@@ -1,6 +1,14 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 
 from .models import User, UserProfile
 
-admin.site.register(User)
-admin.site.register(UserProfile)
+
+@admin.register(User)
+class UserAdmin(DefaultUserAdmin):
+    pass
+
+
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    pass
