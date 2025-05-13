@@ -13,6 +13,8 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
+from apps.taxonomy.views import TreeOfLifeView
+
 # Admin site configuration
 admin.site.site_header = "Urban Tree Observatory"
 admin.site.site_title = "UTO Admin"
@@ -60,6 +62,10 @@ urlpatterns = [
     # Development tools
     path("api-auth/", include("rest_framework.urls")),
     path("i18n/", include("django.conf.urls.i18n")),
+]
+
+urlpatterns += [
+    path("tree-of-life/", TreeOfLifeView.as_view(), name="tree-of-life"),
 ]
 
 # Wrap admin URLs with i18n_patterns

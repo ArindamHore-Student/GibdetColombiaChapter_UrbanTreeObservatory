@@ -1,3 +1,4 @@
+from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
 from rest_framework.decorators import action
@@ -137,3 +138,7 @@ class TraitViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_fields = ["type"]
     ordering_fields = ["type"]
     ordering = ["type"]
+
+
+class TreeOfLifeView(TemplateView):
+    template_name = "taxonomy/tree_of_life.html"
