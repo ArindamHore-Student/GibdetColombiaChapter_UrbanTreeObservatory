@@ -260,167 +260,13 @@
             svg.call(zoom);
         }
 
-        // Mock data for testing - this would be replaced with your actual fetch call
+        // Fetch data
         function fetchData() {
             statusElement.textContent = "Loading taxonomy data...";
 
-            // For testing purposes, create mock data
-            // In your Django template, you'd use the actual fetch call to your API
-            const mockData = {
-                name: "Root",
-                type: "root",
-                children: [
-                    {
-                        name: "Pinaceae",
-                        type: "family",
-                        children: [
-                            {
-                                name: "Pinus",
-                                type: "genus",
-                                children: [
-                                    {
-                                        name: "Pinus strobus",
-                                        type: "species",
-                                        scientific_name: "Pinus strobus",
-                                        life_form: "Tree",
-                                        origin: "Native",
-                                        iucn_status: "Least Concern"
-                                    },
-                                    {
-                                        name: "Pinus resinosa",
-                                        type: "species",
-                                        scientific_name: "Pinus resinosa",
-                                        life_form: "Tree",
-                                        origin: "Native",
-                                        iucn_status: "Least Concern"
-                                    }
-                                ]
-                            },
-                            {
-                                name: "Abies",
-                                type: "genus",
-                                children: [
-                                    {
-                                        name: "Abies balsamea",
-                                        type: "species",
-                                        scientific_name: "Abies balsamea",
-                                        life_form: "Tree",
-                                        origin: "Native",
-                                        iucn_status: "Least Concern"
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        name: "Arecaceae",
-                        type: "family",
-                        children: [
-                            {
-                                name: "Phoenix",
-                                type: "genus",
-                                children: [
-                                    {
-                                        name: "Phoenix dactylifera",
-                                        type: "species",
-                                        scientific_name: "Phoenix dactylifera",
-                                        life_form: "Palm Tree",
-                                        origin: "Introduced",
-                                        iucn_status: "Least Concern"
-                                    }
-                                ]
-                            },
-                            {
-                                name: "Cocos",
-                                type: "genus",
-                                children: [
-                                    {
-                                        name: "Cocos nucifera",
-                                        type: "species",
-                                        scientific_name: "Cocos nucifera",
-                                        life_form: "Palm Tree",
-                                        origin: "Introduced",
-                                        iucn_status: "Not Evaluated"
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        name: "Rosaceae",
-                        type: "family",
-                        children: [
-                            {
-                                name: "Rosa",
-                                type: "genus",
-                                children: [
-                                    {
-                                        name: "Rosa canina",
-                                        type: "species",
-                                        scientific_name: "Rosa canina",
-                                        life_form: "Shrub",
-                                        origin: "Introduced",
-                                        iucn_status: "Least Concern"
-                                    },
-                                    {
-                                        name: "Rosa rugosa",
-                                        type: "species",
-                                        scientific_name: "Rosa rugosa",
-                                        life_form: "Shrub",
-                                        origin: "Introduced",
-                                        iucn_status: "Least Concern"
-                                    }
-                                ]
-                            },
-                            {
-                                name: "Malus",
-                                type: "genus",
-                                children: [
-                                    {
-                                        name: "Malus domestica",
-                                        type: "species",
-                                        scientific_name: "Malus domestica",
-                                        life_form: "Tree",
-                                        origin: "Introduced",
-                                        iucn_status: "Not Evaluated"
-                                    }
-                                ]
-                            },
-                            {
-                                name: "Prunus",
-                                type: "genus",
-                                children: [
-                                    {
-                                        name: "Prunus persica",
-                                        type: "species",
-                                        scientific_name: "Prunus persica",
-                                        life_form: "Tree",
-                                        origin: "Introduced",
-                                        iucn_status: "Not Evaluated"
-                                    },
-                                    {
-                                        name: "Prunus avium",
-                                        type: "species",
-                                        scientific_name: "Prunus avium",
-                                        life_form: "Tree",
-                                        origin: "Introduced",
-                                        iucn_status: "Least Concern"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            };
-
-            // In Django template, replace this with code that processes the API response
-            hierarchyData = mockData;
             updateStatistics();
             drawTree();
-            statusElement.textContent = "Taxonomy data loaded successfully";
 
-            // In your Django template, you'd use this fetch call:
-            /*
             fetch('/api/v1/taxonomy/families/hierarchy/')
                 .then(response => {
                     if (!response.ok) {
@@ -439,7 +285,6 @@
                     console.error("Error fetching taxonomy data:", error);
                     statusElement.textContent = `Error loading data: ${error.message}`;
                 });
-            */
         }
 
         // Update statistics
