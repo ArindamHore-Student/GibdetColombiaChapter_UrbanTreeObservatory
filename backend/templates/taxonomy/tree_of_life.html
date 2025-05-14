@@ -1,0 +1,572 @@
+{% extends "base.html" %}
+
+{% block title %}Radial Tree of Life{% endblock title %}
+
+{% block extra_css %}
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .main-container {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .sidebar {
+    width: 280px;
+    padding: 20px;
+    border-right: 1px solid #eee;
+    background: #f9f9f9;
+    overflow-y: auto;
+  }
+
+  .visualization-container {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .node circle {
+    fill: #fff;
+    stroke-width: 1.5px;
+  }
+
+  .node text {
+    font: 10px sans-serif;
+    fill: #333;
+  }
+
+  .node--internal text {
+    text-shadow: 0 1px 0 #fff, 0 -1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff;
+  }
+
+  .link {
+    fill: none;
+    stroke: #ccc;
+    stroke-width: 1.5px;
+  }
+
+  .tooltip {
+    position: absolute;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    pointer-events: none;
+    font-size: 12px;
+    max-width: 300px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+  }
+
+  .tooltip h4 {
+    margin: 0 0 5px 0;
+    font-size: 14px;
+  }
+
+  .tooltip p {
+    margin: 2px 0;
+  }
+
+  .controls {
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+    background: #fff;
+  }
+
+  .controls button {
+    margin-right: 10px;
+    padding: 8px 16px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .controls button:hover {
+    background-color: #f1f1f1;
+  }
+
+  #status {
+    margin: 5px 0;
+    color: #666;
+    font-style: italic;
+  }
+
+  #visualization {
+    flex: 1;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .card {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 20px;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-title {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .card-text {
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  .sidebar-section {
+    margin-bottom: 30px;
+  }
+
+  .sidebar-title {
+    font-size: 18px;
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .stat-item {
+    margin-bottom: 15px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .legend-color {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 24px;
+  }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+<div class="header">
+  <h1>Tree of Life Visualization</h1>
+</div>
+
+<div class="main-container">
+  <div class="sidebar">
+    <div id="status">Loading taxonomy data...</div>
+
+    <div class="sidebar-section">
+      <h3 class="sidebar-title">Statistics</h3>
+      <div class="stat-item">
+        <div class="card">
+          <h5 class="card-title">Families</h5>
+          <p class="card-text" id="familyCount">-</p>
+        </div>
+      </div>
+      <div class="stat-item">
+        <div class="card">
+          <h5 class="card-title">Genera</h5>
+          <p class="card-text" id="genusCount">-</p>
+        </div>
+      </div>
+      <div class="stat-item">
+        <div class="card">
+          <h5 class="card-title">Species</h5>
+          <p class="card-text" id="speciesCount">-</p>
+        </div>
+      </div>
+      <div class="stat-item">
+        <div class="card">
+          <h5 class="card-title">Largest Family</h5>
+          <p class="card-text" id="largestFamily">-</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <h3 class="sidebar-title">Legend</h3>
+      <div class="legend-item"><span class="legend-color" style="background-color: #4682b4"></span> Family</div>
+      <div class="legend-item"><span class="legend-color" style="background-color: #5f9ea0"></span> Genus</div>
+      <div class="legend-item"><span class="legend-color" style="background-color: #82b446"></span> Tree</div>
+      <div class="legend-item"><span class="legend-color" style="background-color: #b4824a"></span> Palm Tree</div>
+      <div class="legend-item"><span class="legend-color" style="background-color: #746eb3"></span> Shrub</div>
+      <div class="legend-item"><span class="legend-color" style="background-color: #999"></span> Other</div>
+    </div>
+  </div>
+
+  <div class="visualization-container">
+    <div class="controls">
+      <button id="zoomIn">Zoom In</button>
+      <button id="zoomOut">Zoom Out</button>
+      <button id="resetZoom">Reset View</button>
+
+      <label style="margin-left: 15px"> <input type="checkbox" id="showLabels" checked /> Show Labels </label>
+    </div>
+
+    <div id="visualization"></div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block extra_js %}
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // DOM elements
+    const visualizationContainer = document.getElementById('visualization');
+    const statusElement = document.getElementById('status');
+    const zoomInButton = document.getElementById('zoomIn');
+    const zoomOutButton = document.getElementById('zoomOut');
+    const resetZoomButton = document.getElementById('resetZoom');
+    const showLabelsCheckbox = document.getElementById('showLabels');
+
+    // Count elements
+    const familyCountElement = document.getElementById('familyCount');
+    const genusCountElement = document.getElementById('genusCount');
+    const speciesCountElement = document.getElementById('speciesCount');
+    const largestFamilyElement = document.getElementById('largestFamily');
+
+    // Initialize variables
+    let svg;
+    let g;
+    let zoom;
+    let hierarchyData;
+    let root;
+
+    // Create tooltip
+    const tooltip = d3.select('body').append('div').attr('class', 'tooltip').style('opacity', 0);
+
+    // Set dimensions - full viewport size for better display of large datasets
+    const width = visualizationContainer.clientWidth;
+    const height = window.innerHeight - 100; // Almost full viewport height
+    const radius = Math.min(width, height) / 1.8;
+
+    // Initialize SVG
+    function initializeSvg() {
+      // Create SVG
+      svg = d3
+        .select(visualizationContainer)
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height)
+        .attr('viewBox', [-width / 2, -height / 2, width, height])
+        .style('font', '10px sans-serif');
+
+      // Create a group for the tree
+      g = svg.append('g');
+
+      // Set up zoom behavior with extended scale range for larger datasets
+      zoom = d3
+        .zoom()
+        .scaleExtent([0.05, 10])
+        .on('zoom', event => {
+          g.attr('transform', event.transform);
+        });
+
+      svg.call(zoom);
+    }
+
+    // Fetch data
+    function fetchData() {
+      statusElement.textContent = 'Loading taxonomy data...';
+
+      updateStatistics();
+      drawTree();
+
+      fetch('/api/v1/taxonomy/families/hierarchy/')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`API request failed with status ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Taxonomy data loaded successfully');
+          hierarchyData = data;
+          updateStatistics();
+          drawTree();
+          statusElement.textContent = 'Taxonomy data loaded successfully';
+        })
+        .catch(error => {
+          console.error('Error fetching taxonomy data:', error);
+          statusElement.textContent = `Error loading data: ${error.message}`;
+        });
+    }
+
+    // Update statistics
+    function updateStatistics() {
+      if (!hierarchyData) return;
+
+      // Count families
+      const familyCount = hierarchyData.children?.length || 0;
+      familyCountElement.textContent = familyCount;
+
+      // Count genera
+      let genusCount = 0;
+      let speciesCount = 0;
+      let largestFamily = '';
+      let maxGenera = 0;
+
+      hierarchyData.children?.forEach(family => {
+        const genusCountForFamily = family.children?.length || 0;
+        genusCount += genusCountForFamily;
+
+        // Find largest family
+        if (genusCountForFamily > maxGenera) {
+          maxGenera = genusCountForFamily;
+          largestFamily = family.name;
+        }
+
+        // Count species
+        family.children?.forEach(genus => {
+          speciesCount += genus.children?.length || 0;
+        });
+      });
+
+      genusCountElement.textContent = genusCount;
+      speciesCountElement.textContent = speciesCount;
+      largestFamilyElement.textContent = largestFamily || 'None';
+    }
+
+    // Draw tree
+    function drawTree() {
+      if (!hierarchyData || !svg || !g) return;
+
+      // Clear existing content
+      g.selectAll('*').remove();
+
+      // Create hierarchy
+      root = d3.hierarchy(hierarchyData);
+
+      // Calculate the count of total descendants for each node
+      root.count();
+
+      // Create cluster layout for better arrangement of large datasets
+      const tree = d3
+        .cluster()
+        .size([2 * Math.PI, radius])
+        .separation((a, b) => {
+          // Improved separation function for better spacing
+          return (a.parent == b.parent ? 1 : 2) / a.depth;
+        });
+
+      // Apply tree layout
+      tree(root);
+
+      // Add links - use thinner lines for better visualization with large datasets
+      g.selectAll('.link')
+        .data(root.links())
+        .join('path')
+        .attr('class', 'link')
+        .attr(
+          'd',
+          d3
+            .linkRadial()
+            .angle(d => d.x)
+            .radius(d => d.y)
+        )
+        .style('stroke-width', d => Math.max(0.5, 1.5 - d.source.depth * 0.25)); // Thinner lines for deeper levels
+
+      // Add nodes
+      const nodes = g
+        .selectAll('.node')
+        .data(root.descendants())
+        .join('g')
+        .attr('class', d => `node ${d.children ? 'node--internal' : 'node--leaf'}`)
+        .attr('transform', d => `translate(${radialPoint(d.x, d.y)})`)
+        .on('mouseover', function (event, d) {
+          tooltip.transition().duration(200).style('opacity', 0.9);
+
+          let tooltipHtml = `<h4>${d.data.name}</h4>`;
+
+          if (d.data.type === 'species') {
+            tooltipHtml += `<p><strong>Scientific Name:</strong> ${d.data.scientific_name || d.data.name}</p>`;
+            if (d.data.life_form) tooltipHtml += `<p><strong>Life Form:</strong> ${d.data.life_form}</p>`;
+            if (d.data.origin) tooltipHtml += `<p><strong>Origin:</strong> ${d.data.origin}</p>`;
+            if (d.data.iucn_status) tooltipHtml += `<p><strong>IUCN Status:</strong> ${d.data.iucn_status}</p>`;
+          } else {
+            tooltipHtml += `<p><strong>Type:</strong> ${d.data.type}</p>`;
+            if (d.children) {
+              tooltipHtml += `<p><strong>Direct Children:</strong> ${d.children.length}</p>`;
+              tooltipHtml += `<p><strong>Total Descendants:</strong> ${d.descendants().length - 1}</p>`;
+            }
+          }
+
+          tooltip
+            .html(tooltipHtml)
+            .style('left', event.pageX + 10 + 'px')
+            .style('top', event.pageY - 28 + 'px');
+        })
+        .on('mouseout', function () {
+          tooltip.transition().duration(500).style('opacity', 0);
+        });
+
+      // Add circles to nodes with adaptive sizing for depth
+      nodes
+        .append('circle')
+        .attr('r', d => Math.max(3, getNodeRadius(d) - d.depth * 0.5)) // Smaller nodes at deeper levels
+        .style('fill', d => getNodeColor(d))
+        .style('stroke', d => d3.rgb(getNodeColor(d)).darker(0.5))
+        .style('stroke-width', d => 1.2 - d.depth * 0.15); // Thinner borders for deeper nodes
+
+      // Add labels to nodes - optimized for better display with large datasets
+      nodes
+        .append('text')
+        .attr('dy', '.31em')
+        .attr('x', d => (d.x < Math.PI ? 6 : -6))
+        .attr('text-anchor', d => (d.x < Math.PI ? 'start' : 'end'))
+        .attr('transform', d => `rotate(${((d.x < Math.PI ? d.x - Math.PI / 2 : d.x + Math.PI / 2) * 180) / Math.PI})`)
+        .style('font-size', d => getNodeFontSize(d))
+        .style('opacity', d => {
+          // Show labels based on depth for better performance
+          if (!showLabelsCheckbox.checked) return 0;
+          // Only show labels for upper levels by default
+          return d.depth < 3 ? 1 : 0;
+        })
+        .text(d => {
+          // Shorter names for deeper nodes to avoid clutter
+          if (d.depth > 2 && d.data.name.length > 10) {
+            return d.data.name.substring(0, 8) + '...';
+          }
+          return d.data.name;
+        })
+        .each(function (d) {
+          // More aggressive ellipsis for text that would be too long
+          const self = d3.select(this);
+          const maxLength = 30 - d.depth * 5; // Shorter max length for deeper nodes
+
+          if (d.data.name.length > maxLength) {
+            self.text(d.data.name.substring(0, maxLength - 3) + '...');
+          }
+        });
+
+      // Initial positioning - Slightly zoomed out to see more data
+      resetView();
+    }
+
+    // Helper function to convert polar to Cartesian coordinates
+    function radialPoint(x, y) {
+      return [(y = +y) * Math.cos((x -= Math.PI / 2)), y * Math.sin(x)];
+    }
+
+    // Helper functions
+    function getNodeRadius(d) {
+      // Base radius on node type and adjust for depth
+      switch (d.data.type) {
+        case 'root':
+          return 10;
+        case 'family':
+          return 8;
+        case 'genus':
+          return 6;
+        default:
+          return 4; // species
+      }
+    }
+
+    function getNodeFontSize(d) {
+      // Adjust font size based on both type and depth
+      switch (d.data.type) {
+        case 'root':
+          return '16px';
+        case 'family':
+          return '12px';
+        case 'genus':
+          return Math.max(9, 11 - d.depth) + 'px';
+        default:
+          return Math.max(8, 10 - d.depth) + 'px'; // species
+      }
+    }
+
+    function getNodeColor(d) {
+      // Enhanced color scheme with opacity based on depth
+      switch (d.data.type) {
+        case 'root':
+          return '#000';
+        case 'family':
+          return '#4682B4'; // Steel Blue
+        case 'genus':
+          return '#5F9EA0'; // Cadet Blue
+        default: {
+          // For species, color based on life form if available
+          const lifeForm = d.data.life_form?.toLowerCase() || '';
+          if (lifeForm.includes('tree')) return '#82B446'; // Green
+          if (lifeForm.includes('palm')) return '#B4824A'; // Brown
+          if (lifeForm.includes('shrub')) return '#746EB3'; // Purple
+          return '#999'; // Default gray
+        }
+      }
+    }
+
+    // Control functions
+    function zoomIn() {
+      svg.transition().duration(300).call(zoom.scaleBy, 1.3);
+    }
+
+    function zoomOut() {
+      svg.transition().duration(300).call(zoom.scaleBy, 0.7);
+    }
+
+    function resetView() {
+      svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity);
+    }
+
+    function toggleLabels() {
+      const showLabels = showLabelsCheckbox.checked;
+      g.selectAll('.node text').style('opacity', showLabels ? 1 : 0);
+    }
+
+    // Set up event listeners
+    zoomInButton.addEventListener('click', zoomIn);
+    zoomOutButton.addEventListener('click', zoomOut);
+    resetZoomButton.addEventListener('click', resetView);
+    showLabelsCheckbox.addEventListener('change', toggleLabels);
+
+    // Initialize visualization
+    initializeSvg();
+    fetchData();
+
+    // Handle window resize
+    window.addEventListener('resize', function () {
+      const newWidth = visualizationContainer.clientWidth;
+      const newHeight = visualizationContainer.clientHeight || 800;
+      const newRadius = Math.min(newWidth, newHeight) / 2 - 80;
+
+      // Update SVG dimensions
+      svg
+        .attr('width', newWidth)
+        .attr('height', newHeight)
+        .attr('viewBox', [-newWidth / 2, -newHeight / 2, newWidth, newHeight]);
+
+      // Redraw tree with new dimensions
+      if (hierarchyData) {
+        drawTree();
+      }
+    });
+  });
+</script>
+{% endblock extra_js %}

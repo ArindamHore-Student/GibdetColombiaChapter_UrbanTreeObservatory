@@ -1,6 +1,9 @@
+from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.response import Response
 
 from .models import Family, FunctionalGroup, Genus, Species, Trait
 from .serializers import (
@@ -26,6 +29,49 @@ class FamilyViewSet(viewsets.ReadOnlyModelViewSet):
     search_fields = ["name"]
     ordering_fields = ["name", "created_at"]
     ordering = ["name"]
+
+    @action(detail=False, methods=["get"])
+    def hierarchy(self, request):
+        """Return taxonomy data in a hierarchical format for D3.js visualization."""
+        hierarchy = {
+            "name": "Tree of Life",
+            "children": [],
+        }
+        families = self.get_queryset()
+        for family in families:
+            family_node = {
+                "name": family.name,
+                "id": family.id,
+                "uuid": str(family.uuid),
+                "type": "family",
+                "children": [],
+            }
+            genera = family.genera.all()
+            for genus in genera:
+                genus_node = {
+                    "name": genus.name,
+                    "id": genus.id,
+                    "uuid": str(genus.uuid),
+                    "type": "genus",
+                    "children": [],
+                }
+                species_list = genus.species.all()
+                for species in species_list:
+                    species_node = {
+                        "name": species.name,
+                        "id": species.id,
+                        "uuid": str(species.uuid),
+                        "scientific_name": species.scientific_name,
+                        "type": "species",
+                        "life_form": species.get_life_form_display(),
+                        "origin": species.get_origin_display(),
+                        "iucn_status": species.get_iucn_status_display(),
+                    }
+                    genus_node["children"].append(species_node)
+                family_node["children"].append(genus_node)
+            hierarchy["children"].append(family_node)
+
+        return Response(hierarchy)
 
 
 class GenusViewSet(viewsets.ReadOnlyModelViewSet):
@@ -92,3 +138,7 @@ class TraitViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_fields = ["type"]
     ordering_fields = ["type"]
     ordering = ["type"]
+
+
+class TreeOfLifeView(TemplateView):
+    template_name = "taxonomy/tree_of_life.html"
